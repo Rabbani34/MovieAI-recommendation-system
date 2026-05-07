@@ -162,4 +162,4 @@ MIT License — free to use, modify and distribute.
 
 ## 👨‍💻 Author
 
-Built as a college project — contributions welcome!
+Rabbani34
