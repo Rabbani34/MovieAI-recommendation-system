@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MovieAI — Discover Cinema</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,900;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+
+<div class="grain-overlay" aria-hidden="true"></div>
+<div id="toast-container" aria-live="polite"></div>
+
+<!-- WATCHLIST DRAWER -->
+<div id="watchlist-overlay" class="wl-overlay"></div>
+<aside id="watchlist-drawer" class="wl-drawer" aria-label="Watchlist">
+  <div class="wl-header">
+    <h2><i class="fa-solid fa-bookmark"></i> Watchlist</h2>
+    <button id="wl-close"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div id="wl-items" class="wl-items"></div>
+  <div class="wl-footer"><button id="wl-clear">Clear All</button></div>
+</aside>
+
+<!-- MODAL -->
+<div id="modal-overlay" class="modal-overlay" aria-hidden="true">
+  <div id="movie-modal" class="movie-modal" role="dialog" aria-modal="true">
+    <button class="modal-close" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-backdrop-wrap">
+      <img id="modal-backdrop" src="" alt="" class="modal-backdrop-img"/>
+      <div class="modal-backdrop-fade"></div>
+    </div>
+    <div class="modal-body">
+      <img id="modal-poster" src="" alt="" class="modal-poster"/>
+      <div class="modal-info">
+        <h2 id="modal-title"></h2>
+        <div class="modal-meta">
+          <span id="modal-year"  class="badge"></span>
+          <span id="modal-rating" class="badge badge-gold"><i class="fa-solid fa-star"></i> <span id="modal-rating-val"></span></span>
+          <span id="modal-genres" class="badge badge-subtle"></span>
+        </div>
+        <p id="modal-overview" class="modal-overview"></p>
+        <div class="modal-actions">
+          <a id="modal-imdb"   href="#" target="_blank" class="btn-imdb"><i class="fa-solid fa-film"></i> IMDb</a>
+          <a id="modal-detail" href="#" class="btn-detail"><i class="fa-solid fa-circle-info"></i> Full Details</a>
+          <button id="modal-wl-btn" class="btn-wl"><i class="fa-solid fa-heart"></i> Watchlist</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <span class="logo-icon">▶</span>
+      <span class="logo-text">Movie<em>AI</em></span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Discover</a>
+      <a href="/?genre=Action"   class="nav-link">Action</a>
+      <a href="/?genre=Drama"    class="nav-link">Drama</a>
+      <a href="/?genre=Thriller" class="nav-link">Thriller</a>
+    </div>
+    <div class="nav-actions">
+      {% if current_user %}
+      <a href="/profile" class="nav-user-btn" title="{{ current_user.username }}">
+        <i class="fa-solid fa-circle-user"></i>
+        <span class="nav-username">{{ current_user.username }}</span>
+      </a>
+      <a href="/logout" class="nav-icon-btn" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></a>
+      {% else %}
+      <a href="/login"    class="nav-auth-btn">Login</a>
+      <a href="/register" class="nav-auth-btn nav-auth-btn--primary">Sign Up</a>
+      {% endif %}
+      <button id="wl-open-btn" class="nav-icon-btn" title="Watchlist">
+        <i class="fa-solid fa-bookmark"></i>
+        <span id="wl-badge" class="wl-badge hidden">0</span>
+      </button>
+      <button id="theme-toggle" class="nav-icon-btn"><i class="fa-solid fa-moon"></i></button>
+    </div>
+  </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+  <div class="flash-banner flash-{{ category }}">
+    <i class="fa-solid fa-{% if category=='success' %}circle-check{% elif category=='error' %}circle-exclamation{% else %}circle-info{% endif %}"></i>
+    {{ message }}
+    <button onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  {% endfor %}
+{% endwith %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer class="site-footer">
+  <p>Made with <i class="fa-solid fa-heart" style="color:#e50914"></i> · Powered by TMDb &amp; MovieLens</p>
+</footer>
+
+<button id="scroll-top" aria-label="Scroll to top"><i class="fa-solid fa-chevron-up"></i></button>
+
+<script>const IS_LOGGED_IN = {{ 'true' if current_user else 'false' }};</script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

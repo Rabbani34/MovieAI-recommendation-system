@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="profile-section">
+  <div class="section-inner">
+
+    <!-- Header -->
+    <div class="profile-header">
+      <div class="profile-avatar"><i class="fa-solid fa-circle-user"></i></div>
+      <div>
+        <h1 class="profile-name">{{ user.username }}</h1>
+        <p class="profile-email">{{ user.email }}</p>
+        <p class="profile-joined">Member since {{ user.created_at[:10] }}</p>
+      </div>
+      <div class="profile-stats">
+        <div class="stat"><span class="stat-val">{{ ratings|length }}</span><span class="stat-label">Ratings</span></div>
+        <div class="stat"><span class="stat-val">{{ watchlist|length }}</span><span class="stat-label">Watchlist</span></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="profile-tabs">
+      <button class="ptab active" data-tab="ratings">⭐ My Ratings</button>
+      <button class="ptab" data-tab="watchlist">🔖 Watchlist</button>
+    </div>
+
+    <!-- Ratings Tab -->
+    <div class="profile-tab-content" id="tab-ratings">
+      {% if ratings %}
+      <div class="profile-grid">
+        {% for r in ratings %}
+        <div class="profile-movie-card">
+          <a href="/movie?title={{ r.movie_title|urlencode }}">
+            <img src="{{ r.poster or 'https://placehold.co/140x210/111/555?text=?' }}" alt="{{ r.movie_title }}" loading="lazy"/>
+          </a>
+          <div class="profile-movie-info">
+            <p class="profile-movie-title">{{ r.movie_title }}</p>
+            <div class="profile-stars">
+              {% for i in [1,2,3,4,5] %}
+              <span class="pstar {% if r.rating >= i %}filled{% endif %}">★</span>
+              {% endfor %}
+            </div>
+            <button class="profile-remove-rating" data-title="{{ r.movie_title }}">
+              <i class="fa-solid fa-trash-can"></i> Remove
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="profile-empty">
+        <i class="fa-solid fa-star"></i>
+        <p>You haven't rated any movies yet.</p>
+        <a href="/" class="btn-imdb">Discover Movies</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Watchlist Tab -->
+    <div class="profile-tab-content hidden" id="tab-watchlist">
+      {% if watchlist %}
+      <div class="profile-grid">
+        {% for m in watchlist %}
+        <div class="profile-movie-card">
+          <a href="/movie?title={{ m.movie_title|urlencode }}">
+            <img src="{{ m.poster or 'https://placehold.co/140x210/111/555?text=?' }}" alt="{{ m.movie_title }}" loading="lazy"/>
+          </a>
+          <div class="profile-movie-info">
+            <p class="profile-movie-title">{{ m.movie_title }}</p>
+            <p class="profile-movie-genre">{{ m.genres.replace('|',' · ') }}</p>
+            <button class="profile-remove-wl" data-title="{{ m.movie_title }}" data-poster="{{ m.poster }}" data-genres="{{ m.genres }}">
+              <i class="fa-solid fa-bookmark-slash"></i> Remove
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="profile-empty">
+        <i class="fa-solid fa-bookmark"></i>
+        <p>Your watchlist is empty.</p>
+        <a href="/" class="btn-imdb">Browse Movies</a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+<script>
+// Profile tabs
+document.querySelectorAll(".ptab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".ptab").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".profile-tab-content").forEach(t => t.classList.add("hidden"));
+    btn.classList.add("active");
+    document.getElementById("tab-" + btn.dataset.tab).classList.remove("hidden");
+  });
+});
+// Remove rating
+document.querySelectorAll(".profile-remove-rating").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const title = btn.dataset.title;
+    await fetch("/api/rate/delete", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title})});
+    btn.closest(".profile-movie-card").remove();
+  });
+});
+// Remove from watchlist
+document.querySelectorAll(".profile-remove-wl").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const {title, poster, genres} = btn.dataset;
+    await fetch("/api/watchlist/toggle", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title,poster,genres})});
+    btn.closest(".profile-movie-card").remove();
+  });
+});
+</script>
+{% endblock %}

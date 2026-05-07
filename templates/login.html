@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="auth-section">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="logo-icon">▶</span>
+      <span class="logo-text">Movie<em>AI</em></span>
+    </div>
+
+    {% if mode == "login" %}
+    <h1 class="auth-title">Welcome Back</h1>
+    <p class="auth-sub">Sign in to access your watchlist &amp; ratings.</p>
+    {% else %}
+    <h1 class="auth-title">Create Account</h1>
+    <p class="auth-sub">Join MovieAI to save movies and get personalised picks.</p>
+    {% endif %}
+
+    {% if error %}
+    <div class="auth-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+    {% endif %}
+
+    <form method="POST" class="auth-form">
+      {% if mode == "register" %}
+      <div class="auth-field">
+        <label>Username</label>
+        <input type="text" name="username" required minlength="3" placeholder="e.g. cinephile99" autofocus/>
+      </div>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="you@example.com"/>
+      </div>
+      {% else %}
+      <div class="auth-field">
+        <label>Username</label>
+        <input type="text" name="username" required placeholder="Your username" autofocus/>
+      </div>
+      {% endif %}
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" name="password" required minlength="6" placeholder="••••••••"/>
+      </div>
+      {% if mode == "register" %}
+      <div class="auth-field">
+        <label>Confirm Password</label>
+        <input type="password" name="confirm" required placeholder="••••••••"/>
+      </div>
+      {% endif %}
+      <button type="submit" class="auth-submit">
+        {% if mode == "login" %}Sign In{% else %}Create Account{% endif %}
+      </button>
+    </form>
+
+    <p class="auth-switch">
+      {% if mode == "login" %}
+      Don't have an account? <a href="/register">Sign up free</a>
+      {% else %}
+      Already have an account? <a href="/login">Sign in</a>
+      {% endif %}
+    </p>
+  </div>
+</section>
+{% endblock %}

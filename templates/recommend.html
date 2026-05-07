@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% set has_results = recommendations or genre_results or for_you %}
+
+{# ══ MACRO: reusable movie card — defined FIRST ══ #}
+{% macro movie_card(movie, rating_map) %}
+<div class="movie-card"
+  data-title="{{ movie.title }}"
+  data-genres="{{ movie.genres }}"
+  data-rating="{{ movie.rating }}"
+  data-year="{{ movie.year }}"
+  data-overview="{{ movie.overview }}"
+  data-imdb="{{ movie.imdb_link }}"
+  data-poster="{{ movie.poster }}"
+  data-backdrop="{{ movie.backdrop }}"
+  data-tmdb-rating="{{ movie.tmdb_rating }}"
+  tabindex="0" role="button">
+
+  <div class="card-poster-wrap">
+    <img src="{{ movie.poster }}" alt="{{ movie.title }}" class="card-poster" loading="lazy"/>
+    <div class="card-overlay">
+      <div class="card-overlay-content">
+        <p class="card-overview-preview">{{ (movie.overview or "")[:110] }}{% if (movie.overview or "")|length > 110 %}…{% endif %}</p>
+        <div class="card-overlay-actions">
+          <button class="ov-btn ov-btn-primary open-modal-btn"><i class="fa-solid fa-circle-info"></i> Quick View</button>
+          <button class="ov-btn ov-btn-wl add-wl-btn"><i class="fa-solid fa-bookmark"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="card-rating-badge"><i class="fa-solid fa-star"></i> {{ "%.1f"|format(movie.rating|float) }}</div>
+    {% if movie.year %}<div class="card-year-badge">{{ movie.year }}</div>{% endif %}
+  </div>
+
+  <div class="card-info">
+    <h3 class="card-title">{{ movie.title }}</h3>
+    <p class="card-genres">{{ (movie.genres or "").replace('|',' · ') }}</p>
+    <div class="card-bottom">
+      <a href="/movie?title={{ movie.title|urlencode }}" class="card-detail-link" onclick="event.stopPropagation()">
+        <i class="fa-solid fa-circle-info"></i> Details
+      </a>
+      <div class="star-rating"
+        data-title="{{ movie.title }}"
+        data-poster="{{ movie.poster }}"
+        data-genres="{{ movie.genres }}">
+        {% for i in [1,2,3,4,5] %}
+        <button class="star {% if (rating_map or {}).get(movie.title, 0) >= i %}filled{% endif %}"
+          data-val="{{ i }}" onclick="event.stopPropagation()">★</button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% if movie.similar %}
+  <div class="similar-strip">
+    <p class="similar-label">Similar</p>
+    <div class="similar-scroll">
+      {% for sim in movie.similar %}
+      <div class="sim-item" title="{{ sim.title }}">
+        <img src="{{ sim.poster }}" data-title="{{ sim.title }}" alt="{{ sim.title }}" loading="lazy"/>
+        <span class="sim-title">{{ sim.title }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+<!-- ░░ HERO — compact when results exist ░░ -->
+<section class="hero {% if has_results %}hero--compact{% endif %}">
+  <div class="hero-content">
+    {% if not has_results %}
+    <p class="hero-eyebrow">AI-Powered Discovery</p>
+    <h1 class="hero-title">Find Your Next<br/><em>Favourite Film</em></h1>
+    <p class="hero-sub">Type a movie you love and we'll find what you'll watch next.</p>
+    {% endif %}
+
+    <form method="POST" class="search-form" id="movie-form" autocomplete="off">
+      <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" name="movie_title" id="movie-input"
+          placeholder="Search a movie…"
+          value="{{ query }}" class="search-input" autocomplete="off"/>
+        <div id="autocomplete-dropdown" class="autocomplete-dropdown hidden"></div>
+        <button type="submit" class="search-btn">
+          <span>Recommend</span><i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </form>
+
+    <form method="POST" class="genre-form" id="genre-form" autocomplete="off">
+      <div class="genre-search-wrap">
+        <i class="fa-solid fa-masks-theater genre-form-icon"></i>
+        <input type="text" name="genre_name"
+          placeholder="Search by genre (e.g. Action, Horror…)"
+          value="{{ genre_query }}" class="genre-search-input"/>
+        <button type="submit" class="genre-btn">Browse</button>
+      </div>
+    </form>
+  </div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+</section>
+
+<!-- ░░ GENRE CHIPS ░░ -->
+<section class="genre-chips-section">
+  <div class="section-inner">
+    <div class="genre-chips">
+      {% for g in ["Action","Adventure","Animation","Comedy","Crime","Drama","Fantasy","Horror","Mystery","Romance","Sci-Fi","Thriller","Western"] %}
+      <a href="/?genre={{ g }}" class="genre-chip {% if genre_query == g %}active{% endif %}">{{ g }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ░░ ADVANCED FILTERS ░░ -->
+{% if genre_results or genre_query %}
+<section class="filters-bar">
+  <div class="section-inner">
+    <form method="GET" class="filters-form" id="filter-form">
+      <input type="hidden" name="genre_name" value="{{ genre_query }}"/>
+      <div class="filter-group">
+        <label>From Year</label>
+        <input type="number" name="min_year"
+          value="{{ request.args.get('min_year', '') }}"
+          min="1900" max="2025" class="filter-input" placeholder="e.g. 2000"/>
+      </div>
+      <div class="filter-group">
+        <label>To Year</label>
+        <input type="number" name="max_year"
+          value="{{ request.args.get('max_year', '') }}"
+          min="1900" max="2025" class="filter-input" placeholder="e.g. 2024"/>
+      </div>
+      <div class="filter-group">
+        <label>Min TMDb Rating</label>
+        <select name="min_rating" class="filter-select">
+          <option value="" {% if not request.args.get('min_rating') %}selected{% endif %}>Any</option>
+          <option value="6"  {% if request.args.get('min_rating')=='6'  %}selected{% endif %}>6+ ★</option>
+          <option value="7"  {% if request.args.get('min_rating')=='7'  %}selected{% endif %}>7+ ★</option>
+          <option value="7.5"{% if request.args.get('min_rating')=='7.5'%}selected{% endif %}>7.5+ ★</option>
+          <option value="8"  {% if request.args.get('min_rating')=='8'  %}selected{% endif %}>8+ ★</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Search Results</label>
+        <div class="live-filter-wrap">
+          <i class="fa-solid fa-filter"></i>
+          <input type="text" id="genre-live-filter" placeholder="Filter by title…" class="live-filter-input"/>
+        </div>
+      </div>
+      <button type="submit" class="filter-apply-btn">
+        <i class="fa-solid fa-sliders"></i> Apply Filters
+      </button>
+    </form>
+  </div>
+</section>
+{% endif %}
+
+<!-- ░░ FOR YOU ░░ -->
+{% if for_you %}
+<section class="movies-section" id="section-foryou">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> For You</h2>
+      <span class="section-count">Based on your ratings</span>
+    </div>
+    <div class="movies-grid">
+      {% for movie in for_you %}{{ movie_card(movie, user_rating_map) }}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ░░ RECOMMENDATIONS ░░ -->
+{% if recommendations %}
+<section class="movies-section" id="section-results">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        Based on <em>"{{ query }}"</em>
+      </h2>
+      <span class="section-count">{{ recommendations|length }} films</span>
+    </div>
+    <div class="movies-grid">
+      {% for movie in recommendations %}{{ movie_card(movie, user_rating_map) }}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ░░ GENRE RESULTS ░░ -->
+{% if genre_results %}
+<section class="movies-section" id="section-results">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="fa-solid fa-masks-theater"></i> <em>{{ genre_query }}</em> Films
+      </h2>
+      <span class="section-count">{{ genre_results|length }} films</span>
+    </div>
+    <div class="movies-grid" id="genre-grid">
+      {% for movie in genre_results %}{{ movie_card(movie, user_rating_map) }}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ░░ TOP RATED (default) ░░ -->
+{% if not has_results %}
+<section class="movies-section" id="section-top">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-trophy"></i> Top Rated</h2>
+      <span class="section-count">All-time favourites</span>
+    </div>
+    <div class="movies-grid">
+      {% for movie in top_movies %}{{ movie_card(movie, user_rating_map) }}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Auto-scroll to results -->
+{% if has_results %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const el = document.getElementById("section-results") || document.getElementById("section-foryou");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+</script>
+{% endif %}
+
+{% endblock %}

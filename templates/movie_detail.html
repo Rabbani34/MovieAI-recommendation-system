@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if movie.backdrop %}
+<div class="detail-backdrop">
+  <img src="{{ movie.backdrop }}" alt=""/>
+  <div class="detail-backdrop-fade"></div>
+</div>
+{% endif %}
+
+<section class="detail-hero">
+  <div class="detail-inner">
+    <!-- Poster -->
+    <div class="detail-poster-col">
+      <img src="{{ movie.poster }}" alt="{{ movie.title }}" class="detail-poster"/>
+      <!-- User Star Rating -->
+      <div class="detail-rating-box">
+        <p class="detail-rating-label">Your Rating</p>
+        <div class="star-rating star-rating--lg" data-title="{{ movie.title }}" data-poster="{{ movie.poster }}" data-genres="{{ movie.genres }}">
+          {% for i in [1,2,3,4,5] %}
+          <button class="star {% if user_rating >= i %}filled{% endif %}" data-val="{{ i }}">★</button>
+          {% endfor %}
+        </div>
+        <p class="detail-rating-hint" id="rating-hint">
+          {% if user_rating %}You rated this {{ user_rating }}/5{% else %}Click to rate{% endif %}
+        </p>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="detail-info-col">
+      {% if movie.tagline %}<p class="detail-tagline">"{{ movie.tagline }}"</p>{% endif %}
+      <h1 class="detail-title">{{ movie.title }}</h1>
+
+      <div class="detail-meta-row">
+        {% if movie.year %}<span class="badge">{{ movie.year }}</span>{% endif %}
+        {% if movie.runtime %}<span class="badge"><i class="fa-regular fa-clock"></i> {{ movie.runtime }} min</span>{% endif %}
+        {% if movie.vote_average %}<span class="badge badge-gold"><i class="fa-solid fa-star"></i> {{ movie.vote_average }}</span>{% endif %}
+        {% for g in movie.genres %}<span class="badge badge-subtle">{{ g }}</span>{% endfor %}
+      </div>
+
+      {% if movie.director %}
+      <p class="detail-director"><span>Directed by</span> <strong>{{ movie.director }}</strong></p>
+      {% endif %}
+
+      {% if movie.overview %}
+      <p class="detail-overview">{{ movie.overview }}</p>
+      {% endif %}
+
+      <div class="detail-actions">
+        <a href="{{ movie.imdb_link }}" target="_blank" class="btn-imdb"><i class="fa-solid fa-film"></i> View on IMDb</a>
+        <button class="btn-wl add-wl-btn"
+          data-title="{{ movie.title }}" data-poster="{{ movie.poster }}" data-genres="{{ movie.genres }}">
+          <i class="fa-solid fa-bookmark"></i> Watchlist
+        </button>
+      </div>
+
+      <!-- Cast -->
+      {% if movie.cast %}
+      <div class="detail-cast">
+        <h3 class="detail-section-heading">Cast</h3>
+        <div class="cast-grid">
+          {% for person in movie.cast %}
+          <div class="cast-card">
+            <img src="{{ person.photo or 'https://placehold.co/80x80/1a1a1a/555?text=?' }}"
+              alt="{{ person.name }}" class="cast-photo"/>
+            <p class="cast-name">{{ person.name }}</p>
+            <p class="cast-char">{{ person.character }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Trailer -->
+{% if movie.trailer_key %}
+<section class="detail-trailer">
+  <div class="detail-inner">
+    <h2 class="detail-section-heading"><i class="fa-solid fa-play"></i> Trailer</h2>
+    <div class="trailer-wrap">
+      <iframe
+        src="https://www.youtube.com/embed/{{ movie.trailer_key }}"
+        title="Trailer" frameborder="0" allowfullscreen
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+      </iframe>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Similar Movies -->
+{% if movie.similar %}
+<section class="movies-section">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-film"></i> You Might Also Like</h2>
+    </div>
+    <div class="movies-grid">
+      {% for sim in movie.similar %}
+      <a href="/movie?title={{ sim.title|urlencode }}" class="movie-card movie-card--link"
+        data-title="{{ sim.title }}" data-poster="{{ sim.poster }}" data-genres="" data-rating="" data-year="" data-overview="" data-imdb="#" data-backdrop="" data-tmdb-rating="">
+        <div class="card-poster-wrap">
+          <img src="{{ sim.poster }}" alt="{{ sim.title }}" class="card-poster" loading="lazy"/>
+          <div class="card-overlay">
+            <div class="card-overlay-content">
+              <div class="card-overlay-actions">
+                <button class="ov-btn ov-btn-wl add-wl-btn"><i class="fa-solid fa-bookmark"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-info">
+          <h3 class="card-title">{{ sim.title }}</h3>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}
