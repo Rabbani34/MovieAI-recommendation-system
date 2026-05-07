@@ -2,7 +2,12 @@
 
 A full-stack movie recommendation system built with Flask, scikit-learn, and SQLite.
 
-![MovieAI](https://img.shields.io/badge/Python-3.11-blue) ![Flask](https://img.shields.io/badge/Flask-3.1-green) ![License](https://img.shields.io/badge/License-MIT-yellow)
+![Python](https://img.shields.io/badge/Python-3.11-blue) ![Flask](https://img.shields.io/badge/Flask-3.1-green) ![License](https://img.shields.io/badge/License-MIT-yellow) ![Deploy](https://img.shields.io/badge/Deployed-PythonAnywhere-brightgreen)
+
+## 🌐 Live Demo
+👉 **https://YOUR_USERNAME.pythonanywhere.com**
+
+---
 
 ## ✨ Features
 
@@ -11,97 +16,150 @@ A full-stack movie recommendation system built with Flask, scikit-learn, and SQL
 - 🖼️ **Movie Posters** — Real posters via TMDb integration
 - 🔍 **Instant Search** — FTS5 full-text search index
 - 🎭 **Genre Browsing** — Filter by Action, Drama, Comedy and more
-- 👤 **User Accounts** — Register, login, personalized experience
+- 🔎 **Advanced Filters** — Filter by year range and minimum rating
+- 👤 **User Accounts** — Register, login, personalised experience
 - ❤️ **Watchlist** — Save movies to watch later (synced to DB)
 - 📄 **Movie Detail Pages** — Full info, cast, YouTube trailers
+- 🎯 **For You** — Personalised picks based on your ratings
 - 🌙 **Dark/Light Mode** — Theme toggle
 - 📱 **Responsive UI** — Works on mobile and desktop
+
+---
 
 ## 🗂️ Project Structure
 
 ```
-movie_recommender/
-├── run.py                  # Flask app entry point
-├── requirements.txt        # Python dependencies
-├── Procfile               # Deployment config
-├── build_db_full.py       # Database builder script
+movieai/
+├── run.py                    # Flask app entry point
+├── wsgi.py                   # PythonAnywhere WSGI config
+├── requirements.txt          # Python dependencies
+├── build_db_full.py          # Full dataset integration script
+├── build_db_kaggle.py        # Kaggle-only DB builder
+├── README.md
 ├── recommender/
 │   ├── __init__.py
-│   ├── model.py           # ML model + DB queries
-│   ├── routes.py          # Flask routes
-│   ├── database.py        # SQLite user/ratings/watchlist
+│   ├── model.py              # ML model + DB queries
+│   ├── routes.py             # Flask routes + API endpoints
+│   ├── database.py           # SQLite user/ratings/watchlist
 │   ├── templates/
-│   │   ├── base.html
-│   │   ├── recommend.html
-│   │   ├── movie_detail.html
-│   │   ├── login.html
-│   │   └── profile.html
+│   │   ├── base.html         # Base layout + navbar
+│   │   ├── recommend.html    # Home + search results
+│   │   ├── movie_detail.html # Full movie detail page
+│   │   ├── login.html        # Login + register
+│   │   └── profile.html      # User profile + ratings
 │   └── static/
-│       ├── style.css
-│       └── script.js
-└── ml-32m/                # MovieLens dataset (not in repo)
+│       ├── style.css         # Cinematic dark UI
+│       └── script.js         # Watchlist, modals, autocomplete
+└── ml-32m/                   # MovieLens dataset (NOT in repo — too large)
     ├── movies.csv
     ├── ratings.csv
     └── links.csv
 ```
 
+---
+
 ## 🚀 Local Setup
 
-### 1. Clone & install
+### 1. Clone the repository
 ```bash
 git clone https://github.com/YOUR_USERNAME/movieai.git
 cd movieai
+```
+
+### 2. Install dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-### 2. Download datasets
-- **MovieLens 32M**: https://grouplens.org/datasets/movielens/32m/
-  - Extract to `ml-32m/` folder
-- **Kaggle TMDb metadata** *(optional, for posters)*: 
-  - https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset
-  - Download `movies_metadata.csv` to project root
+### 3. Download datasets
 
-### 3. Build the database
+**MovieLens 32M** (required):
+- Download from: https://grouplens.org/datasets/movielens/32m/
+- Extract the `ml-32m/` folder into your project root
+
+**Kaggle TMDb metadata** (recommended — adds posters + overviews):
+- Download from: https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset
+- Download `movies_metadata.csv` and place in project root
+
+### 4. Build the database
 ```bash
 python build_db_full.py
 ```
+Takes ~2 minutes. Creates `tmdb_movies.db` with 45k+ movies, real ratings and posters.
 
-### 4. Run
+### 5. Run locally
 ```bash
 python run.py
 ```
 Open http://127.0.0.1:5000
 
-## 🌐 Deploy to Railway
+---
 
-1. Push to GitHub
-2. Go to [railway.app](https://railway.app)
-3. New Project → Deploy from GitHub repo
-4. Add environment variable: `SECRET_KEY=your-secret-key`
-5. Done — auto-deploys on every push!
+## 🌐 Deployment — PythonAnywhere (Free Forever)
 
-> **Note**: The ML datasets are too large for GitHub (~1GB).  
-> On Railway, upload `tmdb_movies.db` as a volume or use the API fallback.
+This app is deployed on **PythonAnywhere** — free forever, never sleeps, persistent storage.
+
+### Quick Deploy Steps
+
+**1. Push to GitHub**
+```bash
+git add .
+git commit -m "Deploy MovieAI"
+git push
+```
+
+**2. On PythonAnywhere (pythonanywhere.com)**
+```bash
+# In PythonAnywhere Bash console:
+git clone https://github.com/YOUR_USERNAME/movieai.git
+cd movieai
+python3.11 -m venv venv
+source venv/bin/activate
+pip install flask werkzeug scikit-learn pandas numpy requests
+```
+
+**3. Configure Web App**
+- Dashboard → Web → Add new web app → Manual config → Python 3.11
+- WSGI file: paste contents of `wsgi.py` (update YOUR_USERNAME)
+- Virtualenv: `/home/YOUR_USERNAME/movieai/venv`
+- Hit Reload → visit `YOUR_USERNAME.pythonanywhere.com`
+
+**4. Upload database** (optional)
+- Files tab → navigate to `~/movieai/` → upload `tmdb_movies.db`
+
+> Full step-by-step guide in `DEPLOY_GUIDE.md`
+
+---
 
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Backend | Python, Flask |
-| ML | scikit-learn (TF-IDF, cosine similarity) |
-| Database | SQLite (FTS5 full-text search) |
-| Ratings Data | MovieLens 32M dataset |
-| Movie Metadata | TMDb API + Kaggle dataset |
-| Frontend | HTML, CSS (custom), Vanilla JS |
+| Backend | Python 3.11, Flask 3.1 |
+| ML Engine | scikit-learn (TF-IDF, cosine similarity) |
+| Database | SQLite with FTS5 full-text search |
+| Ratings Data | MovieLens 32M dataset (32 million reviews) |
+| Movie Metadata | TMDb API + Kaggle TMDb dataset |
+| Frontend | HTML5, CSS3 (custom cinematic UI), Vanilla JS |
 | Auth | Flask sessions, Werkzeug password hashing |
-| Deployment | Railway / Gunicorn |
+| Deployment | PythonAnywhere (free tier) |
+
+---
 
 ## 📊 Dataset Credits
 
-- [MovieLens 32M](https://grouplens.org/datasets/movielens/32m/) — GroupLens Research
-- [TMDb](https://www.themoviedb.org/) — Movie metadata and posters
+- [MovieLens 32M](https://grouplens.org/datasets/movielens/32m/) — GroupLens Research, University of Minnesota
+- [TMDb](https://www.themoviedb.org/) — The Movie Database (API + metadata)
 - [Kaggle TMDb Dataset](https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset) — Rounak Banik
+
+---
 
 ## 📄 License
 
 MIT License — free to use, modify and distribute.
+
+---
+
+## 👨‍💻 Author
+
+Built as a college project — contributions welcome!
