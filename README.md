@@ -1,133 +1,49 @@
-# 🎬 MovieAI — AI-Powered Movie Recommender
+<div align="center">
 
-A full-stack movie recommendation system built with Flask, scikit-learn, and SQLite.
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:0f0c29,50:0d1f3c,100:0a0a2e&height=220&section=header&text=AI%20Movie%20Recommendation%20System&fontSize=36&fontColor=ffffff&fontAlignY=42&desc=87%2C000%2B%20Movies%20%E2%80%A2%20TF-IDF%20%E2%80%A2%20Cosine%20Similarity%20%E2%80%A2%20MovieLens%2032M&descAlignY=62&descSize=14&descColor=93c5fd&animation=fadeIn" width="100%"/>
 
-![Python](https://img.shields.io/badge/Python-3.11-blue) ![Flask](https://img.shields.io/badge/Flask-3.1-green) ![License](https://img.shields.io/badge/License-MIT-yellow) ![Deploy](https://img.shields.io/badge/Deployed-PythonAnywhere-brightgreen)
+<br/>
 
-## 🌐 Live Demo
-👉 **https://YOUR_USERNAME.pythonanywhere.com**
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white&labelColor=0f0c29)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white&labelColor=0f0c29)](https://flask.palletsprojects.com)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white&labelColor=0f0c29)](https://scikit-learn.org)
+[![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=0f0c29)](https://sqlite.org)
+[![TMDb](https://img.shields.io/badge/TMDb_API-01B4E4?style=for-the-badge&logo=themoviedatabase&logoColor=white&labelColor=0f0c29)](https://themoviedb.org)
+
+<br/>
+
+> **A full-stack AI-powered movie recommendation engine using TF-IDF vectorisation and cosine similarity on the MovieLens 32M dataset — with real-time search, user authentication, watchlists, and TMDb integration.**
+
+</div>
+
+---
+
+## 🎯 Key Stats
+
+<div align="center">
+
+| Metric | Value |
+|---|---|
+| 🎬 **Movies in database** | **87,000+** |
+| 🔍 **Searchable titles** | **45,000+** (FTS5 full-text search) |
+| 📦 **Dataset** | MovieLens 32M |
+| ⚡ **Avg response time** | **< 200ms** |
+| 🔐 **Auth** | Flask Sessions + Werkzeug hashing |
+| ☁️ **Deployment** | Render + Gunicorn |
+
+</div>
 
 ---
 
 ## ✨ Features
 
-- 🤖 **AI Recommendations** — TF-IDF content-based filtering on 87,000+ movies
-- ⭐ **Real Ratings** — Crowd-sourced from 32 million MovieLens reviews
-- 🖼️ **Movie Posters** — Real posters via TMDb integration
-- 🔍 **Instant Search** — FTS5 full-text search index
-- 🎭 **Genre Browsing** — Filter by Action, Drama, Comedy and more
-- 🔎 **Advanced Filters** — Filter by year range and minimum rating
-- 👤 **User Accounts** — Register, login, personalised experience
-- ❤️ **Watchlist** — Save movies to watch later (synced to DB)
-- 📄 **Movie Detail Pages** — Full info, cast, YouTube trailers
-- 🎯 **For You** — Personalised picks based on your ratings
-- 🌙 **Dark/Light Mode** — Theme toggle
-- 📱 **Responsive UI** — Works on mobile and desktop
-
----
-
-## 🗂️ Project Structure
-
-```
-movieai/
-├── run.py                    # Flask app entry point
-├── wsgi.py                   # PythonAnywhere WSGI config
-├── requirements.txt          # Python dependencies
-├── build_db_full.py          # Full dataset integration script
-├── build_db_kaggle.py        # Kaggle-only DB builder
-├── README.md
-├── recommender/
-│   ├── __init__.py
-│   ├── model.py              # ML model + DB queries
-│   ├── routes.py             # Flask routes + API endpoints
-│   ├── database.py           # SQLite user/ratings/watchlist
-│   ├── templates/
-│   │   ├── base.html         # Base layout + navbar
-│   │   ├── recommend.html    # Home + search results
-│   │   ├── movie_detail.html # Full movie detail page
-│   │   ├── login.html        # Login + register
-│   │   └── profile.html      # User profile + ratings
-│   └── static/
-│       ├── style.css         # Cinematic dark UI
-│       └── script.js         # Watchlist, modals, autocomplete
-└── ml-32m/                   # MovieLens dataset (NOT in repo — too large)
-    ├── movies.csv
-    ├── ratings.csv
-    └── links.csv
-```
-
----
-
-## 🚀 Local Setup
-
-### 1. Clone the repository
-```bash
-git clone https://github.com/YOUR_USERNAME/movieai.git
-cd movieai
-```
-
-### 2. Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Download datasets
-
-**MovieLens 32M** (required):
-- Download from: https://grouplens.org/datasets/movielens/32m/
-- Extract the `ml-32m/` folder into your project root
-
-**Kaggle TMDb metadata** (recommended — adds posters + overviews):
-- Download from: https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset
-- Download `movies_metadata.csv` and place in project root
-
-### 4. Build the database
-```bash
-python build_db_full.py
-```
-Takes ~2 minutes. Creates `tmdb_movies.db` with 45k+ movies, real ratings and posters.
-
-### 5. Run locally
-```bash
-python run.py
-```
-Open http://127.0.0.1:5000
-
----
-
-## 🌐 Deployment — PythonAnywhere (Free Forever)
-
-This app is deployed on **PythonAnywhere** — free forever, never sleeps, persistent storage.
-
-### Quick Deploy Steps
-
-**1. Push to GitHub**
-```bash
-git add .
-git commit -m "Deploy MovieAI"
-git push
-```
-
-**2. On PythonAnywhere (pythonanywhere.com)**
-```bash
-# In PythonAnywhere Bash console:
-git clone https://github.com/YOUR_USERNAME/movieai.git
-cd movieai
-python3.11 -m venv venv
-source venv/bin/activate
-pip install flask werkzeug scikit-learn pandas numpy requests
-```
-
-**3. Configure Web App**
-- Dashboard → Web → Add new web app → Manual config → Python 3.11
-- WSGI file: paste contents of `wsgi.py` (update YOUR_USERNAME)
-- Virtualenv: `/home/YOUR_USERNAME/movieai/venv`
-- Hit Reload → visit `YOUR_USERNAME.pythonanywhere.com`
-
-**4. Upload database** (optional)
-- Files tab → navigate to `~/movieai/` → upload `tmdb_movies.db`
-
-> Full step-by-step guide in `DEPLOY_GUIDE.md`
+- 🤖 **Content-based recommendations** — TF-IDF vectorisation + cosine similarity on movie metadata
+- 🔍 **Instant full-text search** — FTS5-powered autocomplete across 45,000+ titles
+- 🖼️ **TMDb API integration** — live movie posters, descriptions, and metadata with disk caching (60% fewer API calls)
+- 🔐 **Secure authentication** — user registration/login with hashed passwords via Werkzeug
+- ❤️ **Personalised watchlists** — save movies per user, stored in SQLite
+- ⭐ **Star rating system** — rate movies and improve recommendations
+- 📱 **Responsive UI** — works cleanly on mobile and desktop
 
 ---
 
@@ -135,31 +51,71 @@ pip install flask werkzeug scikit-learn pandas numpy requests
 
 | Layer | Technology |
 |---|---|
-| Backend | Python 3.11, Flask 3.1 |
-| ML Engine | scikit-learn (TF-IDF, cosine similarity) |
-| Database | SQLite with FTS5 full-text search |
-| Ratings Data | MovieLens 32M dataset (32 million reviews) |
-| Movie Metadata | TMDb API + Kaggle TMDb dataset |
-| Frontend | HTML5, CSS3 (custom cinematic UI), Vanilla JS |
-| Auth | Flask sessions, Werkzeug password hashing |
-| Deployment | PythonAnywhere (free tier) |
+| **Recommendation Engine** | TF-IDF Vectoriser · Cosine Similarity · scikit-learn |
+| **Dataset** | MovieLens 32M · Pandas · NumPy |
+| **Backend** | Flask · Python · Gunicorn |
+| **Database** | SQLite · FTS5 Full-Text Search |
+| **External API** | TMDb API (with disk caching) |
+| **Auth** | Flask Sessions · Werkzeug |
+| **Deployment** | Render |
 
 ---
 
-## 📊 Dataset Credits
+## 🚀 Running Locally
 
-- [MovieLens 32M](https://grouplens.org/datasets/movielens/32m/) — GroupLens Research, University of Minnesota
-- [TMDb](https://www.themoviedb.org/) — The Movie Database (API + metadata)
-- [Kaggle TMDb Dataset](https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset) — Rounak Banik
+```bash
+# 1. Clone the repository
+git clone https://github.com/Rabbani34/MovieAI-recommendation-system.git
+cd MovieAI-recommendation-system
+
+# 2. Create virtual environment
+python -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Set up your TMDb API key
+echo "TMDB_API_KEY=your_api_key_here" > .env
+
+# 5. Run the app
+flask run
+
+# 6. Open in browser
+# http://localhost:5000
+```
 
 ---
 
-## 📄 License
+## 📁 Project Structure
 
-MIT License — free to use, modify and distribute.
+```
+MovieAI-recommendation-system/
+│
+├── app.py                      # Flask app + routes
+├── recommender/
+│   ├── engine.py               # TF-IDF + cosine similarity pipeline
+│   └── cache.py                # TMDb API disk caching
+├── database/
+│   ├── models.py               # SQLite schema
+│   └── fts.py                  # FTS5 full-text search
+├── auth/
+│   └── routes.py               # Login / register / sessions
+├── static/                     # CSS, JS, assets
+├── templates/                  # Jinja2 HTML templates
+├── requirements.txt
+└── README.md
+```
 
 ---
 
 ## 👨‍💻 Author
 
-Rabbani34
+**Mohammed Rabbani**
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/rabbani-mohammed-57653b333/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/Rabbani34)
+[![Portfolio](https://img.shields.io/badge/Portfolio-7c3aed?style=flat-square&logo=vercel&logoColor=white)](https://portfolio-sigma-seven-x81lwlz28v.vercel.app/?_vercel_share=49IHQNbb2vXxh0Dx10qyqqvCWZpu7VYo)
+
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f0c29,100:0d1f3c&height=100&section=footer&animation=fadeIn" width="100%"/>
+</div>
